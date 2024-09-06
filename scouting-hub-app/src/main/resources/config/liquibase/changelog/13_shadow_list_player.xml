@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create_shadow_list_player_table" author="liquibase-user" dbms="mysql">
+        <createTable tableName="shadow_list_player">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="shadow_list_player_pk"/>
+            </column>
+            <column name="player_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="shadow_list_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+
+        <addForeignKeyConstraint constraintName="fk_shadow_list_player_player_id"
+                                 baseTableName="shadow_list_player" baseColumnNames="player_id"
+                                 referencedTableName="player" referencedColumnNames="player_id"/>
+
+        <addForeignKeyConstraint constraintName="fk_shadow_list_player_shadow_list_id"
+                                 baseTableName="shadow_list_player" baseColumnNames="shadow_list_id"
+                                 referencedTableName="shadow_list" referencedColumnNames="id"/>
+
+        <addForeignKeyConstraint constraintName="fk_shadow_list_player_position_id"
+                                 baseTableName="shadow_list_player" baseColumnNames="position_id"
+                                 referencedTableName="position" referencedColumnNames="id"/>
+    </changeSet>
+
+
+
+</databaseChangeLog>

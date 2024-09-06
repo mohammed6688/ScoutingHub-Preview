@@ -1,0 +1,36 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Configuration>
+    <Appenders>
+        <Console name="Console" target="SYSTEM_OUT">
+            <PatternLayout
+                    pattern="%d{ISO8601} %X %highlight{%-5level}[%style{%t}{bright,blue}] %style{%logger{1.}}{bright,yellow}: %msg%n%throwable" />
+        </Console>
+
+        <RollingFile name="RollingFile"
+                     fileName="${LOGS_DIR:-/workdir/logs}/shared_logs/app/scoutinghub-be.log"
+                     filePattern="${LOGS_DIR:-/workdir/logs}/shared_logs/archive/scoutinghub-be/%d{yyyy-MM-dd-HH}-scoutinghub-be-%i.log.gz">
+            <Policies>
+                <!-- rollover on startup, daily and when the file reaches
+                    10 MegaBytes -->
+                <!--                <OnStartupTriggeringPolicy />-->
+                <SizeBasedTriggeringPolicy size="${LOG_FILE_ROLLING_SIZE:-100} MB" />
+                <TimeBasedTriggeringPolicy interval="6" modulate="true" />
+            </Policies>
+            <DefaultRolloverStrategy max="${LOG_FILE_MAX_COUNTER:-500}">
+                <Delete basePath="${LOGS_DIR:-/workdir/logs}/archive/scoutinghub-be/" maxDepth="1">
+                    <IfLastModified age="${ROLLING_DELETE_PATTERN:-P365D}" /> <!-- P365D -->
+                </Delete>
+            </DefaultRolloverStrategy>
+        </RollingFile>
+
+    </Appenders>
+
+    <Loggers>
+        <!-- LOG everything at INFO level -->
+        <Root level="info">
+            <AppenderRef ref="Console" />
+            <AppenderRef ref="RollingFile" />
+        </Root>
+    </Loggers>
+
+</Configuration>

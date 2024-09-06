@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd"
+>
+    <changeSet id="create_player_table" author="liquibase-user" dbms="mysql" runOnChange="true">
+        <createTable tableName="player">
+            <column name="player_id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="player_pk"/>
+            </column>
+            <column name="team_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="position_id" type="int"/>
+            <column name="create_date" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP(3)"/>
+            <column name="image" type="varchar(500)"/>
+            <column name="creator_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updater_id" type="int"/>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="nationality" type="varchar(100)"/>
+            <column name="country_code" type="varchar(10)"/>
+            <column name="birth_date" type="date"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_player_team_id"
+                                 baseTableName="player" baseColumnNames="team_id"
+                                 referencedTableName="team" referencedColumnNames="team_id"/>
+        <addForeignKeyConstraint constraintName="fk_player_position_id"
+                                 baseTableName="player" baseColumnNames="position_id"
+                                 referencedTableName="position" referencedColumnNames="id"/>
+    </changeSet>
+
+
+
+
+</databaseChangeLog>

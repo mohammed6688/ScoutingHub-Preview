@@ -1,0 +1,33 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create_shadow_list_table" author="liquibase-user" dbms="mysql" runOnChange="true">
+        <createTable tableName="shadow_list">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="shadow_list_pk"/>
+            </column>
+            <column name="formation_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="name" type="varchar(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="description" type="varchar(1000)"/>
+            <column name="create_date" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP(3)"/>
+            <column name="creator_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updater_id" type="int"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_shadow_list_formation_id"
+                                 baseTableName="shadow_list" baseColumnNames="formation_id"
+                                 referencedTableName="formation" referencedColumnNames="formation_id"/>
+    </changeSet>
+
+</databaseChangeLog>

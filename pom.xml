@@ -1,0 +1,82 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 https://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+    <parent>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-starter-parent</artifactId>
+        <version>3.2.3</version>
+        <relativePath/> <!-- lookup parent from repository -->
+    </parent>
+    <groupId>com.krnal.products</groupId>
+    <artifactId>scouting-hub</artifactId>
+    <version>0.0.1-SNAPSHOT</version>
+    <packaging>pom</packaging>
+    <name>scouting-hub</name>
+    <description>scouting-hub</description>
+    <modules>
+        <module>scouting-hub-app</module>
+        <module>keycloak-server-config</module>
+    </modules>
+    <properties>
+        <java.version>21</java.version>
+        <org.mapstruct.version>1.5.0.Final</org.mapstruct.version>
+        <org.projectlombok.version>1.18.32</org.projectlombok.version>
+        <jib-maven-plugin.version>3.4.2</jib-maven-plugin.version>
+    </properties>
+    <dependencies>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+            <plugin>
+                <groupId>com.google.cloud.tools</groupId>
+                <artifactId>jib-maven-plugin</artifactId>
+                <version>${jib-maven-plugin.version}</version>
+                <configuration>
+                    <from>
+                        <image>eclipse-temurin:21-alpine</image>
+                    </from>
+                </configuration>
+                <executions>
+                    <execution>
+                        <id>packaging</id>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>dockerBuild</goal>
+                        </goals>
+                    </execution>
+                </executions>
+            </plugin>
+        </plugins>
+    </build>
+
+    <profiles>
+<!--        <profile>-->
+<!--            <id>dev</id>-->
+<!--            <activation>-->
+<!--                <activeByDefault>true</activeByDefault>-->
+<!--            </activation>-->
+<!--            <build>-->
+<!--                <plugins>-->
+<!--                    <plugin>-->
+<!--                        <groupId>com.google.cloud.tools</groupId>-->
+<!--                        <artifactId>jib-maven-plugin</artifactId>-->
+<!--                        <version>${jib-maven-plugin.version}</version>-->
+<!--                        <executions>-->
+<!--                            <execution>-->
+<!--                                <id>packaging</id>-->
+<!--                                <phase>package</phase>-->
+<!--                                <goals>-->
+<!--                                    <goal>dockerBuild</goal>-->
+<!--                                </goals>-->
+<!--                            </execution>-->
+<!--                        </executions>-->
+<!--                    </plugin>-->
+<!--                </plugins>-->
+<!--            </build>-->
+<!--        </profile>-->
+    </profiles>
+
+</project>

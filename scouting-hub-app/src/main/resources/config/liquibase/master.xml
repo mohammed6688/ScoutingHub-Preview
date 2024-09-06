@@ -1,0 +1,13 @@
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.4.xsd">
+
+    <changeSet author="user" id="addAutoIncrementPK">
+        <addColumn tableName="DATABASECHANGELOG">
+            <column name="uniq_id" type="BIGINT" autoIncrement="true">
+                <constraints primaryKey="true"/>
+            </column>
+        </addColumn>
+    </changeSet>
+
+    <includeAll path="classpath:config/liquibase/changelog"/>
+    <includeAll path="classpath:config/liquibase/insert-data"/>
+</databaseChangeLog>

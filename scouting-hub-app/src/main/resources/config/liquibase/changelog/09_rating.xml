@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create_rating_table" author="liquibase-user" dbms="mysql" runOnChange="true">
+        <createTable tableName="rating">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="rating_pk"/>
+            </column>
+            <column name="factor_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="player_match_report_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="value" type="int" >
+                <constraints nullable="false"/>
+            </column>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_rating_factor_id"
+                                 baseTableName="rating" baseColumnNames="factor_id"
+                                 referencedTableName="factor" referencedColumnNames="factor_id"/>
+
+        <addForeignKeyConstraint constraintName="fk_rating_player_match_report_id"
+                                 baseTableName="rating" baseColumnNames="player_match_report_id"
+                                 referencedTableName="player_match_report" referencedColumnNames="id"/>
+    </changeSet>
+
+
+</databaseChangeLog>

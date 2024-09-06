@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog  xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.26.xsd"
+                    objectQuotingStrategy="QUOTE_ONLY_RESERVED_WORDS">
+
+    <changeSet id="create_zone_table" author="liquibase-user" dbms="mysql">
+        <createTable tableName="zone">
+            <column name="zone_id" type="int" autoIncrement="true">
+                <constraints nullable="false" primaryKey="true" primaryKeyName="zone_pk"/>
+            </column>
+            <column name="create_date" type="TIMESTAMP(3)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP(3)"/>
+            <column name="creator_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="zone_name" type="varchar(100)" >
+                <constraints nullable="false"/>
+            </column>
+            <column name="logo" type="blob"/>
+        </createTable>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                   http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.1.xsd">
+
+    <changeSet id="create_match_report_table" author="liquibase-user" dbms="mysql" runOnChange="true">
+        <createTable tableName="match_report">
+            <column name="id" type="int" autoIncrement="true">
+                <constraints primaryKey="true" primaryKeyName="match_report_pk"/>
+            </column>
+            <column name="first_team_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_team_id" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="first_team_score" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="second_team_score" type="int">
+                <constraints nullable="false"/>
+            </column>
+            <column name="create_date" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="match_date" type="TIMESTAMP(3)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="update_date" type="TIMESTAMP(3)"/>
+            <column name="creator_id" type="VARCHAR(100)">
+                <constraints nullable="false"/>
+            </column>
+            <column name="updater_id" type="int"/>
+            <column name="season" type="varchar(100)"/>
+            <column name="general_notes" type="varchar(1000)"/>
+        </createTable>
+        <addForeignKeyConstraint constraintName="fk_match_report_first_team_id"
+                                 baseTableName="match_report" baseColumnNames="first_team_id"
+                                 referencedTableName="team" referencedColumnNames="team_id"/>
+        <addForeignKeyConstraint constraintName="fk_match_report_second_team_id"
+                                 baseTableName="match_report" baseColumnNames="second_team_id"
+                                 referencedTableName="team" referencedColumnNames="team_id"/>
+    </changeSet>
+
+
+
+</databaseChangeLog>

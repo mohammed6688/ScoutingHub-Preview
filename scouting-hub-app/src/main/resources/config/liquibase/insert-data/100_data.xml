@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<databaseChangeLog
+        xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog
+                      http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-4.24.xsd">
+
+    <changeSet id="load_positions" author="liquibase-user" runOnChange="true">
+        <loadUpdateData
+                file="config/liquibase/insert-data/position_data.csv"
+                tableName="position"
+                primaryKey="id"
+                usePreparedStatements="true">
+        </loadUpdateData>
+    </changeSet>
+
+    <changeSet id="load_factors" author="liquibase-user" runOnChange="true">
+        <loadUpdateData
+                file="config/liquibase/insert-data/factor_data.csv"
+                tableName="factor"
+                primaryKey="factor_id"
+                usePreparedStatements="true">
+        </loadUpdateData>
+    </changeSet>
+
+    <changeSet id="load_formations" author="liquibase-user" runOnChange="true">
+        <loadUpdateData
+                file="config/liquibase/insert-data/formation_data.csv"
+                tableName="formation"
+                primaryKey="formation_id"
+                usePreparedStatements="true">
+        </loadUpdateData>
+    </changeSet>
+
+<!--    <changeSet id="load_position_factor" author="liquibase-user" runOnChange="true">-->
+<!--        <loadUpdateData-->
+<!--                file="config/liquibase/insert-data/position_factor_data.csv"-->
+<!--                tableName="position_factor"-->
+<!--                primaryKey="position_factor_id"-->
+<!--                usePreparedStatements="true">-->
+<!--        </loadUpdateData>-->
+<!--    </changeSet>-->
+</databaseChangeLog>

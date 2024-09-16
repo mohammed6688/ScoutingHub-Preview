@@ -76,6 +76,18 @@
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter-aop</artifactId>
         </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-client</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-security</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-oauth2-resource-server</artifactId>
+        </dependency>
 
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -155,11 +167,11 @@
                 <version>${jib-maven-plugin.version}</version>
                 <configuration>
                     <container>
-                        <entrypoint>
-                            <shell>java</shell>
-                            <argument>-jar</argument>
-                            <argument>/app/libs/${project.artifactId}-${project.version}.jar</argument>
-                        </entrypoint>
+<!--                        <entrypoint>-->
+<!--                            <shell>java</shell>-->
+<!--                            <argument>-jar</argument>-->
+<!--                            <argument>/app/libs/${project.artifactId}-${project.version}.jar</argument>-->
+<!--                        </entrypoint>-->
                         <ports>
                             <port>8080</port>
                         </ports>
@@ -170,19 +182,19 @@
                         <user>1000:1000</user>
                     </container>
                     <containerizingMode>packaged</containerizingMode>
-                    <extraDirectories>
-                        <paths>
-                            <path>
-                                <from>target</from>
-                                <into>/app/libs</into>
-                                <includes>${project.artifactId}-${project.version}.jar</includes>
-                            </path>
-                            <!--                            <path>-->
-                            <!--                                <from>target/lib</from>-->
-                            <!--                                <into>/workdir/libs</into>-->
-                            <!--                            </path>-->
-                        </paths>
-                    </extraDirectories>
+<!--                    <extraDirectories>-->
+<!--                        <paths>-->
+<!--                            <path>-->
+<!--                                <from>target</from>-->
+<!--                                <into>/app/libs</into>-->
+<!--                                <includes>${project.artifactId}-${project.version}.jar</includes>-->
+<!--                            </path>-->
+<!--                            &lt;!&ndash;                            <path>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                <from>target/lib</from>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                                <into>/workdir/libs</into>&ndash;&gt;-->
+<!--                            &lt;!&ndash;                            </path>&ndash;&gt;-->
+<!--                        </paths>-->
+<!--                    </extraDirectories>-->
                 </configuration>
             </plugin>
         </plugins>

@@ -1,11 +1,9 @@
 package com.krnal.products.scoutinghub.api;
 
-import com.krnal.products.scoutinghub.dto.PlayerDTO;
 import com.krnal.products.scoutinghub.dto.ShadowListDTO;
 import com.krnal.products.scoutinghub.enums.OperationTypeEnum;
 import com.krnal.products.scoutinghub.enums.ResourceTypeEnum;
 import com.krnal.products.scoutinghub.events.CalendarEvent;
-import com.krnal.products.scoutinghub.service.PlayerService;
 import com.krnal.products.scoutinghub.service.ShadowListService;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.types.ShadowListResponse;
@@ -14,10 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationEventPublisher;
-import org.springframework.core.io.Resource;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Sort;
-import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +21,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @RestController
 @RequestMapping("/api")

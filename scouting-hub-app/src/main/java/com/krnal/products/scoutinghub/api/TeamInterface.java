@@ -1,7 +1,5 @@
 package com.krnal.products.scoutinghub.api;
 
-import com.krnal.products.scoutinghub.dto.ZoneDTO;
-import com.krnal.products.scoutinghub.types.ApiError;
 import com.krnal.products.scoutinghub.dto.TeamDTO;
 import com.krnal.products.scoutinghub.service.TeamService;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
@@ -20,7 +18,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @RestController
 @RequestMapping("/api")

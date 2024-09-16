@@ -12,8 +12,11 @@ import java.io.IOException;
 @Component
 public class PlayerUpdateHelper implements UpdateHelper<Player, PlayerDTO> {
 
-    @Autowired
-    FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
+
+    public PlayerUpdateHelper(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
+    }
 
     @Override
     public void set(Player player, PlayerDTO playerDTO) throws IOException {

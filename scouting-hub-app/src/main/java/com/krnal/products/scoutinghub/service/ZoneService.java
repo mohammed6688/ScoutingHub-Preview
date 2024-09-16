@@ -1,11 +1,12 @@
 package com.krnal.products.scoutinghub.service;
 
 import com.krnal.products.scoutinghub.dao.ZoneRepo;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.dto.ZoneDTO;
 import com.krnal.products.scoutinghub.mapper.ZoneMapper;
 import com.krnal.products.scoutinghub.model.Zone;
-import com.krnal.products.scoutinghub.specification.ZoneSpecification;
+import com.krnal.products.scoutinghub.specification.ZoneDecorator;
 import com.krnal.products.scoutinghub.types.ZoneResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,18 +21,21 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class ZoneService {
-    Logger logger = LoggerFactory.getLogger(ZoneService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ZoneService.class);
 
-    @Autowired
-    ZoneRepo zoneRepo;
-    @Autowired
-    ZoneMapper zoneMapper;
-    @Autowired
-    ZoneUpdateHelper zoneUpdateHelper;
+    private final ZoneRepo zoneRepo;
+    private final ZoneMapper zoneMapper;
+    private final ZoneUpdateHelper zoneUpdateHelper;
+
+    public ZoneService(ZoneRepo zoneRepo, ZoneMapper zoneMapper, ZoneUpdateHelper zoneUpdateHelper) {
+        this.zoneRepo = zoneRepo;
+        this.zoneMapper = zoneMapper;
+        this.zoneUpdateHelper = zoneUpdateHelper;
+    }
 
     public ZoneResponse getZones() {
         String c = "ZoneService";
@@ -40,7 +44,7 @@ public class ZoneService {
             logger.info(createLogMessage(c, m, "Start"));
             List<Zone> zones = zoneRepo.findAll();
             List<ZoneDTO> zoneDTOList = zones.stream()
-                    .map(zone -> zoneMapper.getZoneDTO(zone))
+                    .map(zoneMapper::getZoneDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new ZoneResponse(zoneDTOList, zones.size());
@@ -57,7 +61,7 @@ public class ZoneService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<Zone> zones = zoneRepo.findAll(pageable);
             List<ZoneDTO> zoneDTOList = zones.stream()
-                    .map(zone -> zoneMapper.getZoneDTO(zone))
+                    .map(zoneMapper::getZoneDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new ZoneResponse(zoneDTOList, zones.getTotalElements());
@@ -163,7 +167,7 @@ public class ZoneService {
 
             Page<Zone> zones = zoneRepo.findAll(spec, pageable);
             List<ZoneDTO> zoneDTOList = zones.stream()
-                    .map(zone -> zoneMapper.getZoneDTO(zone))
+                    .map(zoneMapper::getZoneDTO)
                     .toList();
 
             return new ZoneResponse(zoneDTOList, zones.getTotalElements());
@@ -175,6 +179,7 @@ public class ZoneService {
     }
 
     private Specification<Zone> createSpecification(SearchCriteria criteria) {
-        return new ZoneSpecification(criteria);
+        Specification<Zone> specification = new SimpleSpecification<>(criteria);
+        return new ZoneDecorator(specification);
     }
 }

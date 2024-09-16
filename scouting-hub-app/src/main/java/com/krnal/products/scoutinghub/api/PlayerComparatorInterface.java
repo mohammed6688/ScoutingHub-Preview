@@ -3,7 +3,6 @@ package com.krnal.products.scoutinghub.api;
 import com.krnal.products.scoutinghub.dto.PlayerDTO;
 import com.krnal.products.scoutinghub.service.PlayerService;
 import com.krnal.products.scoutinghub.service.StatisticsService;
-import com.krnal.products.scoutinghub.types.FactorEfficiency;
 import com.krnal.products.scoutinghub.types.PlayerComparatorResponse;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import org.slf4j.Logger;
@@ -17,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @RestController
 @RequestMapping("/api")

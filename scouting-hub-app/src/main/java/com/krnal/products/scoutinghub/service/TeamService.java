@@ -6,7 +6,8 @@ import com.krnal.products.scoutinghub.mapper.PlayerMapper;
 import com.krnal.products.scoutinghub.mapper.TeamMapper;
 import com.krnal.products.scoutinghub.model.Player;
 import com.krnal.products.scoutinghub.model.Team;
-import com.krnal.products.scoutinghub.specification.TeamSpecification;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
+import com.krnal.products.scoutinghub.specification.TeamDecorator;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.types.TeamResponse;
 import org.slf4j.Logger;
@@ -24,22 +25,25 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class TeamService {
-    Logger logger = LoggerFactory.getLogger(TeamService.class);
+    private static final Logger logger = LoggerFactory.getLogger(TeamService.class);
 
-    @Autowired
-    TeamRepo teamRepo;
-    @Autowired
-    TeamMapper teamMapper;
-    @Autowired
-    TeamUpdateHelper teamUpdateHelper;
-    @Autowired
-    FileStorageService fileStorageService;
-    @Autowired
-    PlayerMapper playerMapper;
+    private final TeamRepo teamRepo;
+    private final TeamMapper teamMapper;
+    private final TeamUpdateHelper teamUpdateHelper;
+    private final FileStorageService fileStorageService;
+    private final PlayerMapper playerMapper;
+
+    public TeamService(TeamRepo teamRepo, TeamMapper teamMapper, TeamUpdateHelper teamUpdateHelper, FileStorageService fileStorageService, PlayerMapper playerMapper) {
+        this.teamRepo = teamRepo;
+        this.teamMapper = teamMapper;
+        this.teamUpdateHelper = teamUpdateHelper;
+        this.fileStorageService = fileStorageService;
+        this.playerMapper = playerMapper;
+    }
 
     public TeamResponse getTeams() {
         String c = "TeamService";
@@ -48,7 +52,7 @@ public class TeamService {
             logger.info(createLogMessage(c, m, "Start"));
             List<Team> teams = teamRepo.findAll();
             List<TeamDTO> teamDTOList = teams.stream()
-                    .map(team -> teamMapper.getTeamDTO(team))
+                    .map(teamMapper::getTeamDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new TeamResponse(teamDTOList, teams.size());
@@ -65,7 +69,7 @@ public class TeamService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<Team> teams = teamRepo.findAll(pageable);
             List<TeamDTO> teamDTOList = teams.stream()
-                    .map(team -> teamMapper.getTeamDTO(team))
+                    .map(teamMapper::getTeamDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new TeamResponse(teamDTOList, teams.getTotalElements());
@@ -84,9 +88,8 @@ public class TeamService {
             if (team.isPresent()){
                 TeamDTO teamDTO = teamMapper.getTeamDTO(team.get());
                 Optional <List<Player>> optionalPlayers = teamRepo.findPlayersByTeamId(teamDTO.getId());
-                if (optionalPlayers.isPresent()){
-                    teamDTO.setPlayerDTOList(optionalPlayers.get().stream().map(player -> playerMapper.getPlayerDTO(player)).collect(Collectors.toList()));
-                }
+                optionalPlayers.ifPresent(players ->
+                        teamDTO.setPlayerDTOList(players.stream().map(playerMapper::getPlayerDTO).collect(Collectors.toList())));
                 logger.info(createLogMessage(c, m, "Success"));
                 return teamDTO;
             }
@@ -195,7 +198,7 @@ public class TeamService {
 
             Page<Team> teams = teamRepo.findAll(spec, pageable);
             List<TeamDTO> teamDTOList = teams.stream()
-                    .map(team -> teamMapper.getTeamDTO(team))
+                    .map(teamMapper::getTeamDTO)
                     .toList();
 
             return new TeamResponse(teamDTOList, teams.getTotalElements());
@@ -207,6 +210,7 @@ public class TeamService {
     }
 
     private Specification<Team> createSpecification(SearchCriteria criteria) {
-        return new TeamSpecification(criteria);
+        Specification<Team> specification = new SimpleSpecification<>(criteria);
+        return new TeamDecorator(specification, criteria);
     }
 }

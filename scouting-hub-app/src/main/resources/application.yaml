@@ -3,6 +3,8 @@ scouting_hub:
     url: jdbc:mysql://localhost:13306/scoutinghub
     username: root
     password: root
+  keycloak:
+    url: http://localhost:18080/realms/scoutinghub
 
 spring:
   application:
@@ -20,7 +22,27 @@ spring:
       hibernate:
         type:
           wrapper_array_handling: ALLOW
+  security:
+    oauth2:
+      resourceserver:
+        jwt:
+          issuer-uri: ${scouting_hub.keycloak.url}
+      client:
+        registration:
+          keycloak:
+            client-id: backend
+            authorization-grant-type: authorization_code
+            scope: openid
+        provider:
+          keycloak:
+            issuer-uri: ${scouting_hub.keycloak.url}
+            user-name-attribute: preferred_username
   servlet:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+#logging:
+#  level:
+#    root: INFO
+#    org.springframework.web: DEBUG
+#    org.keycloak: DEBUG

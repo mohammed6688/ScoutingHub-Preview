@@ -18,10 +18,13 @@ import static com.krnal.products.scoutinghub.constants.Constant.RATING_ID_NOT_EX
 @Component
 public class MatchReportUpdateHelper implements UpdateHelper<MatchReport, MatchReportDTO> {
 
-    @Autowired
-    PlayerMatchReportMapper playerMatchReportMapper;
-    @Autowired
-    RatingMapper ratingMapper;
+    private final PlayerMatchReportMapper playerMatchReportMapper;
+    private final RatingMapper ratingMapper;
+
+    public MatchReportUpdateHelper(PlayerMatchReportMapper playerMatchReportMapper, RatingMapper ratingMapper) {
+        this.playerMatchReportMapper = playerMatchReportMapper;
+        this.ratingMapper = ratingMapper;
+    }
 
     @Override
     public void set(MatchReport matchReport, MatchReportDTO matchReportDTO) {
@@ -71,11 +74,10 @@ public class MatchReportUpdateHelper implements UpdateHelper<MatchReport, MatchR
                         .filter(report -> report.getId().equals(playerMatchReportDTO.getId()))
                         .findFirst();
 
-                if (playerMatchReportOpt.isPresent()) {
-                    updatePlayerMatchReport(playerMatchReportOpt.get(), playerMatchReportDTO);
-                } else {
+                if (playerMatchReportOpt.isEmpty()) {
                     throw new IllegalArgumentException(PLAYER_MATCH_REPORT_ID_NOT_EXIST);
                 }
+                updatePlayerMatchReport(playerMatchReportOpt.get(), playerMatchReportDTO);
 
                 if (playerMatchReportDTO.getRatingDTOList() != null) { // update ratings
                     deleteMissingEntities(playerMatchReportOpt.get().getRatingsList(), playerMatchReportDTO.getRatingDTOList().stream().map(RatingDTO::getId).filter(Objects::nonNull).collect(Collectors.toSet()));
@@ -140,11 +142,12 @@ public class MatchReportUpdateHelper implements UpdateHelper<MatchReport, MatchR
                         .filter(report -> report.getId().equals(ratingDTO.getId()))
                         .findFirst();
 
-                if (ratingOptional.isPresent()) {
-                    setRating(ratingOptional.get(), ratingDTO);
-                } else {
+                if (ratingOptional.isEmpty()) {
                     throw new IllegalArgumentException(RATING_ID_NOT_EXIST);
                 }
+
+                setRating(ratingOptional.get(), ratingDTO);
+
             } else { // add operation
                 ratingDTO.setPlayerMatchReport(new PlayerMatchReportDTO(playerMatchReportId));
                 if (playerMatchReport.getRatingsList() != null) {
@@ -174,11 +177,10 @@ public class MatchReportUpdateHelper implements UpdateHelper<MatchReport, MatchR
     }
 
     public void saveRatings(PlayerMatchReport playerMatchReport) {
-        if (playerMatchReport.getRatingsList() == null) {
-            return;
-        }
-        for (Rating rating : playerMatchReport.getRatingsList()) {
-            rating.setPlayerMatchReport(playerMatchReport);
+        if (playerMatchReport.getRatingsList() != null) {
+            for (Rating rating : playerMatchReport.getRatingsList()) {
+                rating.setPlayerMatchReport(playerMatchReport);
+            }
         }
     }
 
@@ -196,10 +198,6 @@ public class MatchReportUpdateHelper implements UpdateHelper<MatchReport, MatchR
             return ((PlayerMatchReport) entity).getId();
         } else if (entity instanceof Rating) {
             return ((Rating) entity).getId();
-        } else if (entity instanceof ShadowListPlayer) {
-            return ((ShadowListPlayer) entity).getId();
-        } else if (entity instanceof ShadowList) {
-            return ((ShadowList) entity).getId();
         }
         return null;
     }

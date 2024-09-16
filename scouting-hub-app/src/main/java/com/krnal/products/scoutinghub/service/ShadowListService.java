@@ -1,11 +1,16 @@
 package com.krnal.products.scoutinghub.service;
 
+import com.krnal.products.scoutinghub.configs.Configs;
+import com.krnal.products.scoutinghub.dao.ShadowListPlayerRepo;
 import com.krnal.products.scoutinghub.dao.ShadowListRepo;
 import com.krnal.products.scoutinghub.dto.*;
 import com.krnal.products.scoutinghub.mapper.ShadowListMapper;
 import com.krnal.products.scoutinghub.model.ShadowList;
 import com.krnal.products.scoutinghub.model.ShadowListPlayer;
+import com.krnal.products.scoutinghub.security.UserSessionHelper;
 import com.krnal.products.scoutinghub.specification.ShadowListSpecification;
+import com.krnal.products.scoutinghub.specification.ShadowListDecorator;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.types.ShadowListResponse;
 import org.slf4j.Logger;
@@ -22,18 +27,21 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class ShadowListService {
-    Logger logger = LoggerFactory.getLogger(ShadowListService.class);
+    private static final Logger logger = LoggerFactory.getLogger(ShadowListService.class);
 
-    @Autowired
-    ShadowListRepo shadowListRepo;
-    @Autowired
-    ShadowListMapper shadowListMapper;
-    @Autowired
-    ShadowListUpdateHelper shadowListUpdateHelper;
+    private final ShadowListRepo shadowListRepo;
+    private final ShadowListMapper shadowListMapper;
+    private final ShadowListUpdateHelper shadowListUpdateHelper;
+
+    public ShadowListService(ShadowListRepo shadowListRepo, ShadowListMapper shadowListMapper, ShadowListUpdateHelper shadowListUpdateHelper) {
+        this.shadowListRepo = shadowListRepo;
+        this.shadowListMapper = shadowListMapper;
+        this.shadowListUpdateHelper = shadowListUpdateHelper;
+    }
 
     public ShadowListResponse getShadowLists() {
         String c = "ShadowListService";
@@ -42,7 +50,8 @@ public class ShadowListService {
             logger.info(createLogMessage(c, m, "Start"));
             List<ShadowList> shadowLists = shadowListRepo.findAll();
             List<ShadowListDTO> shadowListDTOList = shadowLists.stream()
-                    .map(shadowList -> shadowListMapper.getShadowListDto(shadowList))
+                    .map(shadowListMapper::getShadowListDto)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .collect(Collectors.toList());
             logger.info(createLogMessage(c, m, "Success"));
             return new ShadowListResponse(shadowListDTOList, shadowLists.size());
@@ -59,7 +68,7 @@ public class ShadowListService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<ShadowList> shadowLists = shadowListRepo.findAll(pageable);
             List<ShadowListDTO> shadowListDTOList = shadowLists.stream()
-                    .map(shadowList -> shadowListMapper.getShadowListDto(shadowList))
+                    .map(shadowListMapper::getShadowListDto)
                     .collect(Collectors.toList());
             logger.info(createLogMessage(c, m, "Success"));
             return new ShadowListResponse(shadowListDTOList, shadowLists.getTotalElements());
@@ -178,7 +187,8 @@ public class ShadowListService {
 
             Page<ShadowList> shadowLists = shadowListRepo.findAll(spec, pageable);
                     List<ShadowListDTO> shadowListDTOList = shadowLists.stream()
-                    .map(shadowList -> shadowListMapper.getShadowListDto(shadowList))
+                    .map(shadowListMapper::getShadowListDto)
+                    .filter(shadowList -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || shadowList.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
 
             return new ShadowListResponse(shadowListDTOList, shadowLists.getTotalElements());
@@ -190,6 +200,7 @@ public class ShadowListService {
     }
 
     private Specification<ShadowList> createSpecification(SearchCriteria criteria) {
-        return new ShadowListSpecification(criteria);
+        Specification<ShadowList> specification = new SimpleSpecification<>(criteria);
+        return new ShadowListDecorator(specification);
     }
 }

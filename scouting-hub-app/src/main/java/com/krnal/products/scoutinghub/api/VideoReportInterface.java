@@ -1,7 +1,6 @@
 package com.krnal.products.scoutinghub.api;
 
 import com.krnal.products.scoutinghub.dto.VideoReportDTO;
-import com.krnal.products.scoutinghub.dto.ZoneDTO;
 import com.krnal.products.scoutinghub.enums.OperationTypeEnum;
 import com.krnal.products.scoutinghub.enums.ResourceTypeEnum;
 import com.krnal.products.scoutinghub.events.CalendarEvent;
@@ -21,7 +20,7 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @RestController
 @RequestMapping("/api")

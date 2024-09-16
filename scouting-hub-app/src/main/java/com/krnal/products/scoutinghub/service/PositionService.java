@@ -10,16 +10,19 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class PositionService {
-    Logger logger = LoggerFactory.getLogger(PositionService.class);
+    private static final Logger logger = LoggerFactory.getLogger(PositionService.class);
 
-    @Autowired
-    PositionRepo positionRepo;
-    @Autowired
-    PositionMapper positionMapper;
+    private final PositionRepo positionRepo;
+    private final PositionMapper positionMapper;
+
+    public PositionService(PositionRepo positionRepo, PositionMapper positionMapper) {
+        this.positionRepo = positionRepo;
+        this.positionMapper = positionMapper;
+    }
 
     public List<PositionDTO> getPositions() {
         String c = "PositionService";
@@ -27,7 +30,7 @@ public class PositionService {
         try {
             logger.info(createLogMessage(c, m, "Start"));
             List<PositionDTO> positionDTOList = positionRepo.findAllBy().stream()
-                    .map(position -> positionMapper.getPositionDTO(position))
+                    .map(positionMapper::getPositionDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return positionDTOList;

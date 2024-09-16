@@ -15,15 +15,16 @@ import java.nio.file.Paths;
 import java.nio.file.StandardCopyOption;
 import java.util.UUID;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class FileStorageService {
+    private static final Logger logger = LoggerFactory.getLogger(FileStorageService.class);
+    private final String uploadDir;
 
-    Logger logger = LoggerFactory.getLogger(FileStorageService.class);
-
-    @Value("${file.upload.dir}")
-    private String uploadDir;
+    public FileStorageService(@Value("${file.upload.dir}") String uploadDir) {
+        this.uploadDir = uploadDir;
+    }
 
     public String storeFile(MultipartFile file) throws IOException {
         String c = "FileStorageService";

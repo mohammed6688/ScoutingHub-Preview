@@ -1,5 +1,6 @@
 package com.krnal.products.scoutinghub.service;
 
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dao.PlayerMatchReportRepo;
 import com.krnal.products.scoutinghub.dao.PlayerRepo;
 import com.krnal.products.scoutinghub.dao.RatingRepo;
@@ -7,38 +8,41 @@ import com.krnal.products.scoutinghub.dto.PlayerDTO;
 import com.krnal.products.scoutinghub.enums.FactorRatingEnum;
 import com.krnal.products.scoutinghub.enums.PlayerSuitabilityEnum;
 import com.krnal.products.scoutinghub.mapper.PlayerMapper;
-import com.krnal.products.scoutinghub.model.Player;
 import com.krnal.products.scoutinghub.model.PlayerMatchReport;
 import com.krnal.products.scoutinghub.model.Rating;
 import com.krnal.products.scoutinghub.types.PlayerComparator;
 import com.krnal.products.scoutinghub.types.PlayerComparatorResponse;
+import com.krnal.products.scoutinghub.security.UserSessionHelper;
 import com.krnal.products.scoutinghub.types.FactorEfficiency;
 import com.krnal.products.scoutinghub.types.PlayerSuitability;
-import com.krnal.products.scoutinghub.utils.Utilities;
+import com.krnal.products.scoutinghub.utils.LogUtils;
+import com.krnal.products.scoutinghub.utils.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.Field;
 import java.util.*;
 
 import static com.krnal.products.scoutinghub.constants.Constant.MIN_FACTOR_RATING_REPORTS_COUNT;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class StatisticsService {
-    Logger logger = LoggerFactory.getLogger(StatisticsService.class);
+    private static final Logger logger = LoggerFactory.getLogger(StatisticsService.class);
 
-    @Autowired
-    RatingRepo ratingRepo;
-    @Autowired
-    PlayerMatchReportRepo playerMatchReportRepo;
-    @Autowired
-    PlayerRepo playerRepo;
-    @Autowired
-    PlayerMapper playerMapper;
+    private final RatingRepo ratingRepo;
+    private final PlayerMatchReportRepo playerMatchReportRepo;
+    private final PlayerRepo playerRepo;
+    private final PlayerMapper playerMapper;
+
+    public StatisticsService(RatingRepo ratingRepo, PlayerMatchReportRepo playerMatchReportRepo, PlayerRepo playerRepo, PlayerMapper playerMapper) {
+        this.ratingRepo = ratingRepo;
+        this.playerMatchReportRepo = playerMatchReportRepo;
+        this.playerRepo = playerRepo;
+        this.playerMapper = playerMapper;
+    }
 
     public PlayerComparatorResponse getAllPlayersFactorsEfficiency() {
         String c = "StatisticsService";
@@ -72,7 +76,7 @@ public class StatisticsService {
                     PlayerComparator playerComparator = new PlayerComparator(player);
 
                     for (FactorEfficiency factorEfficiency : factorEfficiencyList) {
-                        String factorName = Utilities.convertToCamelCase(factorEfficiency.getFactorName());
+                        String factorName = StringUtils.convertToCamelCase(factorEfficiency.getFactorName());
 
                         // Use reflection to set the correct field
                         try {
@@ -131,7 +135,10 @@ public class StatisticsService {
     }
 
     private List<PlayerMatchReport> getPlayerMatchReports(Integer playerId) {
-        return playerMatchReportRepo.findAllByPlayerId(playerId);
+        return playerMatchReportRepo.findAllByPlayerId(playerId)
+                .stream()
+                .filter(playerMatchReport -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || playerMatchReport.getMatchReport().getCreatorId().equals(UserSessionHelper.getUserId()))
+                .toList();
     }
 
     private PlayerSuitability aggregateFinalRating(List<PlayerMatchReport> playerMatchReportList) {
@@ -164,7 +171,10 @@ public class StatisticsService {
 
 
     private List<Rating> getPlayerFactorsRating(Integer playerId) {
-        return ratingRepo.findRatingsByPlayerId(playerId);
+        return ratingRepo.findRatingsByPlayerId(playerId)
+                .stream()
+                .filter(rating -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || rating.getPlayerMatchReport().getMatchReport().getCreatorId().equals(UserSessionHelper.getUserId()))
+                .toList();
     }
 
     private List<FactorEfficiency> aggregateRatingsByFactor(List<Rating> playerFactorsRating) {
@@ -217,7 +227,7 @@ public class StatisticsService {
         Comparator<PlayerComparator> comparator = (p1, p2) -> {
             try {
                 // Get the FactorEfficiency object from each PlayerComparator
-                String sortField = Utilities.convertToCamelCase(sortBy);
+                String sortField = StringUtils.convertToCamelCase(sortBy);
                 Field factorField = PlayerComparator.class.getDeclaredField(sortField);
                 factorField.setAccessible(true);
 

@@ -1,11 +1,15 @@
 package com.krnal.products.scoutinghub.service;
 
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dao.PlayerRepo;
 import com.krnal.products.scoutinghub.dto.PlayerDTO;
 import com.krnal.products.scoutinghub.mapper.PlayerMapper;
 import com.krnal.products.scoutinghub.mapper.PlayerMatchReportMapper;
 import com.krnal.products.scoutinghub.model.Player;
 import com.krnal.products.scoutinghub.model.PlayerMatchReport;
+import com.krnal.products.scoutinghub.specification.PlayerDecorator;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
+import com.krnal.products.scoutinghub.security.UserSessionHelper;
 import com.krnal.products.scoutinghub.specification.PlayerSpecification;
 import com.krnal.products.scoutinghub.types.PlayerResponse;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
@@ -24,24 +28,27 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class PlayerService {
-    Logger logger = LoggerFactory.getLogger(PlayerService.class);
+    private static final Logger logger = LoggerFactory.getLogger(PlayerService.class);
 
-    @Autowired
-    PlayerRepo playerRepo;
-    @Autowired
-    PlayerMapper playerMapper;
-    @Autowired
-    PlayerUpdateHelper playerUpdateHelper;
-    @Autowired
-    FileStorageService fileStorageService;
-    @Autowired
-    PlayerMatchReportMapper playerMatchReportMapper;
-    @Autowired
-    StatisticsService statisticsService;
+    private final PlayerRepo playerRepo;
+    private final PlayerMapper playerMapper;
+    private final PlayerUpdateHelper playerUpdateHelper;
+    private final FileStorageService fileStorageService;
+    private final PlayerMatchReportMapper playerMatchReportMapper;
+    private final StatisticsService statisticsService;
+
+    public PlayerService(PlayerRepo playerRepo, PlayerMapper playerMapper, PlayerUpdateHelper playerUpdateHelper, FileStorageService fileStorageService, PlayerMatchReportMapper playerMatchReportMapper, StatisticsService statisticsService) {
+        this.playerRepo = playerRepo;
+        this.playerMapper = playerMapper;
+        this.playerUpdateHelper = playerUpdateHelper;
+        this.fileStorageService = fileStorageService;
+        this.playerMatchReportMapper = playerMatchReportMapper;
+        this.statisticsService = statisticsService;
+    }
 
     public PlayerResponse getPlayers() {
         String c = "PlayerService";
@@ -50,7 +57,7 @@ public class PlayerService {
             logger.info(createLogMessage(c, m, "Start"));
             List<Player> playerList = playerRepo.findAll();
             List<PlayerDTO> playerDTOList = playerList.stream()
-                    .map(player -> playerMapper.getPlayerDTO(player))
+                    .map(playerMapper::getPlayerDTO)
                     .collect(Collectors.toList());
             logger.info(createLogMessage(c, m, "Success"));
             return new PlayerResponse(playerDTOList, playerList.size());
@@ -67,7 +74,7 @@ public class PlayerService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<Player> playerList = playerRepo.findAll(pageable);
             List<PlayerDTO> playerDTOList = playerList.stream()
-                    .map(player -> playerMapper.getPlayerDTO(player))
+                    .map(playerMapper::getPlayerDTO)
                     .collect(Collectors.toList());
             logger.info(createLogMessage(c, m, "Success"));
             return new PlayerResponse(playerDTOList, playerList.getTotalElements());
@@ -88,7 +95,11 @@ public class PlayerService {
                 Optional<List<PlayerMatchReport>> optionalPlayerMatchReports = playerRepo.findPlayerMatchReportByPlayerId(playerDTO.getId());
 
                 if (optionalPlayerMatchReports.isPresent()) {
-                    playerDTO.setPlayerMatchReportList(optionalPlayerMatchReports.get().stream().map(playerMatchReport -> playerMatchReportMapper.getPlayerMatchReportDTO(playerMatchReport)).collect(Collectors.toList()));
+                    playerDTO.setPlayerMatchReportList(optionalPlayerMatchReports.get().stream()
+                            .map(playerMatchReport -> playerMatchReportMapper.getPlayerMatchReportDTO(playerMatchReport))
+                            .filter(playerMatchReport -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || playerMatchReport.getMatchReportDTO().getCreatorId().equals(UserSessionHelper.getUserId()))
+                            .collect(Collectors.toList())
+                    );
                 }
 
                 playerDTO.setFactorEfficiencieList(statisticsService.getFactorsEfficiency(id));
@@ -202,7 +213,7 @@ public class PlayerService {
 
             Page<Player> players = playerRepo.findAll(spec, pageable);
             List<PlayerDTO> playerDTOList = players.stream()
-                    .map(player -> playerMapper.getPlayerDTO(player))
+                    .map(playerMapper::getPlayerDTO)
                     .toList();
 
             return new PlayerResponse(playerDTOList, players.getTotalElements());
@@ -214,6 +225,7 @@ public class PlayerService {
     }
 
     private Specification<Player> createSpecification(SearchCriteria criteria) {
-        return new PlayerSpecification(criteria);
+        Specification<Player> specification = new SimpleSpecification<>(criteria);
+        return new PlayerDecorator(specification, criteria);
     }
 }

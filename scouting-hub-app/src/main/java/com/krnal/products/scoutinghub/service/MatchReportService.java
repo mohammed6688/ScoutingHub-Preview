@@ -1,10 +1,15 @@
 package com.krnal.products.scoutinghub.service;
 
+import com.krnal.products.scoutinghub.configs.Configs;
+import com.krnal.products.scoutinghub.dao.FactorRepo;
 import com.krnal.products.scoutinghub.dao.MatchReportRepo;
 import com.krnal.products.scoutinghub.dto.*;
 import com.krnal.products.scoutinghub.mapper.*;
 import com.krnal.products.scoutinghub.model.*;
+import com.krnal.products.scoutinghub.security.UserSessionHelper;
 import com.krnal.products.scoutinghub.specification.MatchReportSpecification;
+import com.krnal.products.scoutinghub.specification.MatchReportDecorator;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.types.MatchReportResponse;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import org.slf4j.Logger;
@@ -20,20 +25,23 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class MatchReportService {
-    Logger logger = LoggerFactory.getLogger(MatchReportService.class);
+    private static final Logger logger = LoggerFactory.getLogger(MatchReportService.class);
 
-    @Autowired
-    MatchReportRepo matchReportRepo;
-    @Autowired
-    MatchReportMapper matchReportMapper;
-    @Autowired
-    TeamMapper teamMapper;
-    @Autowired
-    MatchReportUpdateHelper matchReportUpdateHelper;
+    private final MatchReportRepo matchReportRepo;
+    private final MatchReportMapper matchReportMapper;
+    private final TeamMapper teamMapper;
+    private final MatchReportUpdateHelper matchReportUpdateHelper;
+
+    public MatchReportService(MatchReportRepo matchReportRepo, MatchReportMapper matchReportMapper, TeamMapper teamMapper, MatchReportUpdateHelper matchReportUpdateHelper) {
+        this.matchReportRepo = matchReportRepo;
+        this.matchReportMapper = matchReportMapper;
+        this.teamMapper = teamMapper;
+        this.matchReportUpdateHelper = matchReportUpdateHelper;
+    }
 
     public MatchReportResponse getMatchReports() {
         String c = "MatchReportService";
@@ -42,7 +50,8 @@ public class MatchReportService {
             logger.info(createLogMessage(c, m, "Start"));
             List<MatchReport> matchReports = matchReportRepo.findAll();
             List<MatchReportDTO> matchReportDTOS = matchReports.stream()
-                    .map(matchReport -> matchReportMapper.getMatchReportDTO(matchReport))
+                    .map(matchReportMapper::getMatchReportDTO)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new MatchReportResponse(matchReportDTOS, matchReports.size());
@@ -59,7 +68,7 @@ public class MatchReportService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<MatchReport> matchReports = matchReportRepo.findAll(pageable);
             List<MatchReportDTO> matchReportDTOS = matchReports.stream()
-                    .map(matchReport -> matchReportMapper.getMatchReportDTO(matchReport))
+                    .map(matchReportMapper::getMatchReportDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new MatchReportResponse(matchReportDTOS, matchReports.getTotalElements());
@@ -179,7 +188,8 @@ public class MatchReportService {
 
             Page<MatchReport> matchReports = matchReportRepo.findAll(spec, pageable);
                     List<MatchReportDTO> matchReportDTOList = matchReports.stream()
-                    .map(matchReport -> matchReportMapper.getMatchReportDTO(matchReport))
+                    .map(matchReportMapper::getMatchReportDTO)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
 
             return new MatchReportResponse(matchReportDTOList, matchReports.getTotalElements());
@@ -191,7 +201,8 @@ public class MatchReportService {
     }
 
     private Specification<MatchReport> createSpecification(SearchCriteria criteria) {
-        return new MatchReportSpecification(criteria);
+        Specification<MatchReport> specification = new SimpleSpecification<>(criteria);
+        return new MatchReportDecorator(specification, criteria);
     }
 
     private void setPlayerMatchReports(MatchReport matchReport) {

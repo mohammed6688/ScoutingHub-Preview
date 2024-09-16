@@ -15,9 +15,11 @@ import static com.krnal.products.scoutinghub.constants.Constant.PLAYER_SHADOW_LI
 @Component
 public class ShadowListUpdateHelper implements UpdateHelper<ShadowList, ShadowListDTO> {
 
-    @Autowired
-    ShadowListPlayerMapper shadowlistplayerMapper;
+    private final ShadowListPlayerMapper shadowlistplayerMapper;
 
+    public ShadowListUpdateHelper(ShadowListPlayerMapper shadowlistplayerMapper) {
+        this.shadowlistplayerMapper = shadowlistplayerMapper;
+    }
 
     @Override
     public void set(ShadowList shadowList, ShadowListDTO shadowListDTO) {
@@ -53,11 +55,11 @@ public class ShadowListUpdateHelper implements UpdateHelper<ShadowList, ShadowLi
                         .findFirst();
 
                 // update the shadow list player
-                if (shadowListPlayerOptional.isPresent()) {
-                    updateShadowListPlayer(shadowListPlayerOptional.get(), shadowListPlayerDTO);
-                } else {
+                if (shadowListPlayerOptional.isEmpty()) {
                     throw new IllegalArgumentException(PLAYER_SHADOW_LIST_ID_NOT_EXIST);
                 }
+                updateShadowListPlayer(shadowListPlayerOptional.get(), shadowListPlayerDTO);
+
             } else {  // update operation
                 saveShadowListPlayer(shadowListPlayerDTO, shadowList);
             }
@@ -97,11 +99,7 @@ public class ShadowListUpdateHelper implements UpdateHelper<ShadowList, ShadowLi
     }
 
     private Integer getEntityId(Object entity) {
-        if (entity instanceof PlayerMatchReport) {
-            return ((PlayerMatchReport) entity).getId();
-        } else if (entity instanceof Rating) {
-            return ((Rating) entity).getId();
-        } else if (entity instanceof ShadowListPlayer) {
+        if (entity instanceof ShadowListPlayer) {
             return ((ShadowListPlayer) entity).getId();
         } else if (entity instanceof ShadowList) {
             return ((ShadowList) entity).getId();

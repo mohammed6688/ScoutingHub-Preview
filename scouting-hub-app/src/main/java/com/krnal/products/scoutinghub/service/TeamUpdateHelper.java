@@ -11,8 +11,11 @@ import java.io.IOException;
 @Component
 public class TeamUpdateHelper implements UpdateHelper<Team, TeamDTO>{
 
-    @Autowired
-    FileStorageService fileStorageService;
+    private final FileStorageService fileStorageService;
+
+    public TeamUpdateHelper(FileStorageService fileStorageService) {
+        this.fileStorageService = fileStorageService;
+    }
 
     @Override
     public void set(Team team, TeamDTO teamDTO) throws IOException {

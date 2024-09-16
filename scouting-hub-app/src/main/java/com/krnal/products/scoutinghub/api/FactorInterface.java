@@ -1,9 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
 import com.krnal.products.scoutinghub.dto.FactorDTO;
-import com.krnal.products.scoutinghub.dto.PositionDTO;
 import com.krnal.products.scoutinghub.service.FactorService;
-import com.krnal.products.scoutinghub.service.PositionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -15,7 +13,7 @@ import org.springframework.web.bind.annotation.RestController;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @RestController
 @RequestMapping("/api")

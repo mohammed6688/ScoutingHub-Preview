@@ -1,28 +1,27 @@
 package com.krnal.products.scoutinghub.service;
 
 import com.krnal.products.scoutinghub.dao.FactorRepo;
-import com.krnal.products.scoutinghub.dao.PositionRepo;
 import com.krnal.products.scoutinghub.dto.FactorDTO;
-import com.krnal.products.scoutinghub.dto.PositionDTO;
 import com.krnal.products.scoutinghub.mapper.FactorMapper;
-import com.krnal.products.scoutinghub.mapper.PositionMapper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class FactorService {
-    Logger logger = LoggerFactory.getLogger(FactorService.class);
+    private static final Logger logger = LoggerFactory.getLogger(FactorService.class);
 
-    @Autowired
-    FactorRepo factorRepo;
-    @Autowired
-    FactorMapper factorMapper;
+    private final FactorRepo factorRepo;
+    private final FactorMapper factorMapper;
+
+    public FactorService(FactorRepo factorRepo, FactorMapper factorMapper) {
+        this.factorRepo = factorRepo;
+        this.factorMapper = factorMapper;
+    }
 
     public List<FactorDTO> getFactors() {
         String c = "FactorService";
@@ -30,7 +29,7 @@ public class FactorService {
         try {
             logger.info(createLogMessage(c, m, "Start"));
             List<FactorDTO> factorDTOList = factorRepo.findAllBy().stream()
-                    .map(factor -> factorMapper.getFactorDTO(factor))
+                    .map(factorMapper::getFactorDTO)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return factorDTOList;

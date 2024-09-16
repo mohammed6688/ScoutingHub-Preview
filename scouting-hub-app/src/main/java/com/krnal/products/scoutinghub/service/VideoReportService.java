@@ -1,9 +1,13 @@
 package com.krnal.products.scoutinghub.service;
 
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dao.VideoReportRepo;
 import com.krnal.products.scoutinghub.dto.VideoReportDTO;
 import com.krnal.products.scoutinghub.mapper.VideoReportMapper;
 import com.krnal.products.scoutinghub.model.VideoReport;
+import com.krnal.products.scoutinghub.specification.SimpleSpecification;
+import com.krnal.products.scoutinghub.specification.VideoReportDecorator;
+import com.krnal.products.scoutinghub.security.UserSessionHelper;
 import com.krnal.products.scoutinghub.specification.VideoReportSpecification;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.types.VideoReportResponse;
@@ -20,18 +24,21 @@ import java.util.List;
 import java.util.Optional;
 
 import static com.krnal.products.scoutinghub.constants.Constant.*;
-import static com.krnal.products.scoutinghub.utils.Utilities.createLogMessage;
+import static com.krnal.products.scoutinghub.utils.LogUtils.createLogMessage;
 
 @Service
 public class VideoReportService {
-    Logger logger = LoggerFactory.getLogger(VideoReportService.class);
+    private static final Logger logger = LoggerFactory.getLogger(VideoReportService.class);
 
-    @Autowired
-    VideoReportRepo videoReportRepo;
-    @Autowired
-    VideoReportMapper videoReportMapper;
-    @Autowired
-    VideoReportUpdateHelper videoReportUpdateHelper;
+    private final VideoReportRepo videoReportRepo;
+    private final VideoReportMapper videoReportMapper;
+    private final VideoReportUpdateHelper videoReportUpdateHelper;
+
+    public VideoReportService(VideoReportRepo videoReportRepo, VideoReportMapper videoReportMapper, VideoReportUpdateHelper videoReportUpdateHelper) {
+        this.videoReportRepo = videoReportRepo;
+        this.videoReportMapper = videoReportMapper;
+        this.videoReportUpdateHelper = videoReportUpdateHelper;
+    }
 
     public VideoReportResponse getVideoReports() {
         String c = "VideoReportService";
@@ -40,7 +47,8 @@ public class VideoReportService {
             logger.info(createLogMessage(c, m, "Start"));
             List<VideoReport> videoReports = videoReportRepo.findAll();
             List<VideoReportDTO> videoReportDTOList = videoReports.stream()
-                    .map(videoReport -> videoReportMapper.getVideoReportDto(videoReport))
+                    .map(videoReportMapper::getVideoReportDto)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new VideoReportResponse(videoReportDTOList, videoReports.size());
@@ -57,7 +65,7 @@ public class VideoReportService {
             logger.info(createLogMessage(c, m, "Start"));
             Page<VideoReport> videoReports = videoReportRepo.findAll(pageable);
             List<VideoReportDTO> videoReportDTOList = videoReports.stream()
-                    .map(videoReport -> videoReportMapper.getVideoReportDto(videoReport))
+                    .map(videoReportMapper::getVideoReportDto)
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new VideoReportResponse(videoReportDTOList, videoReports.getTotalElements());
@@ -163,7 +171,8 @@ public class VideoReportService {
 
             Page<VideoReport> videoReports = videoReportRepo.findAll(spec, pageable);
                     List<VideoReportDTO> videoReportDTOList = videoReports.stream()
-                    .map(videoReport -> videoReportMapper.getVideoReportDto(videoReport))
+                    .map(videoReportMapper::getVideoReportDto)
+                    .filter(videoReport -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || videoReport.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
 
             return new VideoReportResponse(videoReportDTOList, videoReports.getTotalElements());
@@ -175,6 +184,7 @@ public class VideoReportService {
     }
 
     private Specification<VideoReport> createSpecification(SearchCriteria criteria) {
-        return new VideoReportSpecification(criteria);
+        Specification<VideoReport> specification = new SimpleSpecification<>(criteria);
+        return new VideoReportDecorator(specification);
     }
 }

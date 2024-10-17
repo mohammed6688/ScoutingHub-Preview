@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dto.PlayerDTO;
 import com.krnal.products.scoutinghub.service.PlayerService;
 import com.krnal.products.scoutinghub.types.PlayerResponse;
@@ -79,6 +81,7 @@ public class PlayerInterface {
         return ResponseEntity.status(HttpStatus.OK).body(players);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping(value = "player", consumes = MediaType.MULTIPART_FORM_DATA_VALUE)
     public ResponseEntity<?> addPlayer(@Valid PlayerDTO playerDTO) {
         String c = "PlayerInterface";
@@ -89,6 +92,7 @@ public class PlayerInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(player);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("player")
     public ResponseEntity<?> updatePlayer(@Valid PlayerDTO playerDTO) {
         String c = "PlayerInterface";
@@ -99,6 +103,7 @@ public class PlayerInterface {
         return ResponseEntity.status(HttpStatus.OK).body(player);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("player")
     public ResponseEntity<?> deletePlayer(@RequestParam("id") Integer id) {
         String c = "PlayerInterface";

@@ -92,6 +92,27 @@ public class PlayerDecorator extends SpecificationDecorator<Player> {
             };
         }
 
+        if (criteria.getKey().equalsIgnoreCase("age")) {
+            int age;
+            try {
+                age = Integer.parseInt(criteria.getValue().toString()); // Parse the age from criteria
+            } catch (NumberFormatException e) {
+                throw new IllegalArgumentException("Invalid age format");
+            }
+
+            // Calculate the birthdate range based on the age
+            LocalDate today = LocalDate.now();
+            LocalDate birthDateStart = today.minusYears(age + 1).plusDays(1); // Age x years ago + 1 day
+            LocalDate birthDateEnd = today.minusYears(age); // Age x years ago
+
+            return switch (criteria.getOperation()) {
+                case ">" -> builder.lessThanOrEqualTo(root.get("birthDate"), birthDateStart);
+                case "<" -> builder.greaterThanOrEqualTo(root.get("birthDate"), birthDateEnd);
+                case ":" -> builder.between(root.get("birthDate"), birthDateStart, birthDateEnd);
+                default -> throw new UnsupportedOperationException("Operation " + criteria.getOperation() + " not supported for age");
+            };
+        }
+
         return super.toPredicate(root, query, builder);
     }
 }

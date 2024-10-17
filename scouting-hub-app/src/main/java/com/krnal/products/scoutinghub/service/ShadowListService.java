@@ -8,7 +8,6 @@ import com.krnal.products.scoutinghub.mapper.ShadowListMapper;
 import com.krnal.products.scoutinghub.model.ShadowList;
 import com.krnal.products.scoutinghub.model.ShadowListPlayer;
 import com.krnal.products.scoutinghub.security.UserSessionHelper;
-import com.krnal.products.scoutinghub.specification.ShadowListSpecification;
 import com.krnal.products.scoutinghub.specification.ShadowListDecorator;
 import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
@@ -69,6 +68,7 @@ public class ShadowListService {
             Page<ShadowList> shadowLists = shadowListRepo.findAll(pageable);
             List<ShadowListDTO> shadowListDTOList = shadowLists.stream()
                     .map(shadowListMapper::getShadowListDto)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .collect(Collectors.toList());
             logger.info(createLogMessage(c, m, "Success"));
             return new ShadowListResponse(shadowListDTOList, shadowLists.getTotalElements());

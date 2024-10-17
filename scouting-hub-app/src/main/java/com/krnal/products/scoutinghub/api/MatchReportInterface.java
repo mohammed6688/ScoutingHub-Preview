@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dto.MatchReportDTO;
 import com.krnal.products.scoutinghub.enums.OperationTypeEnum;
 import com.krnal.products.scoutinghub.enums.ResourceTypeEnum;
@@ -71,6 +73,7 @@ public class MatchReportInterface {
         return ResponseEntity.status(HttpStatus.OK).body(matchReports);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping("matchReport")
     public ResponseEntity<?> addMatchReport(@Valid @RequestBody MatchReportDTO matchReportDTO) {
         String c = "MatchReportInterface";
@@ -83,6 +86,7 @@ public class MatchReportInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(matchReport);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("matchReport")
     public ResponseEntity<?> updateMatchReport(@Valid @RequestBody MatchReportDTO matchReportDTO) {
         String c = "MatchReportInterface";
@@ -95,6 +99,7 @@ public class MatchReportInterface {
         return ResponseEntity.status(HttpStatus.OK).body(matchReport);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("matchReport")
     public ResponseEntity<?> deleteMatchReport(@RequestParam("id") Integer id) {
         String c = "MatchReportInterface";

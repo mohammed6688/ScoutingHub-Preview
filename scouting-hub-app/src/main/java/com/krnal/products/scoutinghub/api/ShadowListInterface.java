@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dto.ShadowListDTO;
 import com.krnal.products.scoutinghub.enums.OperationTypeEnum;
 import com.krnal.products.scoutinghub.enums.ResourceTypeEnum;
@@ -72,6 +74,7 @@ public class ShadowListInterface {
         return ResponseEntity.status(HttpStatus.OK).body(shadowLists);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping(value = "shadowList", consumes = MediaType.APPLICATION_JSON_VALUE)
     public ResponseEntity<?> addShadowList(@Valid @RequestBody ShadowListDTO shadowListDTO) {
         String c = "ShadowListInterface";
@@ -84,6 +87,7 @@ public class ShadowListInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(shadowList);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("shadowList")
     public ResponseEntity<?> updateShadowList(@Valid @RequestBody ShadowListDTO shadowListDTO) {
         String c = "ShadowListInterface";
@@ -96,6 +100,7 @@ public class ShadowListInterface {
         return ResponseEntity.status(HttpStatus.OK).body(shadowList);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("shadowList")
     public ResponseEntity<?> deleteShadowList(@RequestParam("id") Integer id) {
         String c = "ShadowListInterface";

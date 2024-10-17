@@ -10,7 +10,6 @@ import com.krnal.products.scoutinghub.model.PlayerMatchReport;
 import com.krnal.products.scoutinghub.specification.PlayerDecorator;
 import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.security.UserSessionHelper;
-import com.krnal.products.scoutinghub.specification.PlayerSpecification;
 import com.krnal.products.scoutinghub.types.PlayerResponse;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import org.slf4j.Logger;

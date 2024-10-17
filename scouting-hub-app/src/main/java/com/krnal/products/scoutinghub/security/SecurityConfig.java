@@ -36,14 +36,7 @@ public class SecurityConfig {
     private static final String REALM_ACCESS_CLAIM = "realm_access";
     private static final String ROLES_CLAIM = "roles";
 
-    private final KeycloakLogoutHandler keycloakLogoutHandler;
-
-    private final LoggingFilter loggingFilter;
-
-    SecurityConfig(KeycloakLogoutHandler keycloakLogoutHandler, LoggingFilter loggingFilter) {
-        this.keycloakLogoutHandler = keycloakLogoutHandler;
-        this.loggingFilter = loggingFilter;
-    }
+    SecurityConfig() {}
 
     @Bean
     public SessionRegistry sessionRegistry() {
@@ -63,17 +56,15 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain resourceServerFilterChain(HttpSecurity http) throws Exception {
         http
-                .addFilterBefore(loggingFilter, BasicAuthenticationFilter.class)
+//                .addFilterBefore(loggingFilter, BasicAuthenticationFilter.class)
                 .authorizeHttpRequests(auth -> auth
-                .requestMatchers(new AntPathRequestMatcher("/"))
-                .permitAll()
-                .anyRequest()
-                .authenticated());
+                        .requestMatchers(new AntPathRequestMatcher("/")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/player/image/download/**")).permitAll()
+                        .requestMatchers(new AntPathRequestMatcher("/api/team/image/download/**")).permitAll()
+                        .anyRequest().authenticated());
         http.oauth2ResourceServer((oauth2) -> oauth2
-                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
+//                .authenticationEntryPoint(new CustomAuthenticationEntryPoint())
                 .jwt(Customizer.withDefaults()));
-        http.oauth2Login(Customizer.withDefaults())
-                .logout(logout -> logout.addLogoutHandler(keycloakLogoutHandler).logoutSuccessUrl("/"));
         return http.build();
     }
 

@@ -8,7 +8,6 @@ import com.krnal.products.scoutinghub.model.VideoReport;
 import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.specification.VideoReportDecorator;
 import com.krnal.products.scoutinghub.security.UserSessionHelper;
-import com.krnal.products.scoutinghub.specification.VideoReportSpecification;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.types.VideoReportResponse;
 import org.slf4j.Logger;
@@ -66,6 +65,7 @@ public class VideoReportService {
             Page<VideoReport> videoReports = videoReportRepo.findAll(pageable);
             List<VideoReportDTO> videoReportDTOList = videoReports.stream()
                     .map(videoReportMapper::getVideoReportDto)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new VideoReportResponse(videoReportDTOList, videoReports.getTotalElements());

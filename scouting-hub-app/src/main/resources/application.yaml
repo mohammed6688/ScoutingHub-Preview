@@ -26,17 +26,20 @@ spring:
     oauth2:
       resourceserver:
         jwt:
-          issuer-uri: ${scouting_hub.keycloak.url}
-      client:
-        registration:
-          keycloak:
-            client-id: backend
-            authorization-grant-type: authorization_code
-            scope: openid
-        provider:
-          keycloak:
-            issuer-uri: ${scouting_hub.keycloak.url}
-            user-name-attribute: preferred_username
+          jwk-set-uri: ${scouting_hub.keycloak.url}/protocol/openid-connect/certs
+#      client:
+#        registration:
+#          keycloak:
+#            client-id: backend
+#            authorization-grant-type: authorization_code
+##            redirect-uri: ${scouting_hub.keycloak.url}
+#            scope: openid
+#        provider:
+#          keycloak:
+#            authorization-uri: ${scouting_hub.keycloak.url}/protocol/openid-connect/auth
+#            token-uri: ${scouting_hub.keycloak.url}/protocol/openid-connect/token
+#            jwk-set-uri: ${scouting_hub.keycloak.url}/protocol/openid-connect/certs
+#            user-name-attribute: preferred_username
   servlet:
     multipart:
       max-file-size: 10MB

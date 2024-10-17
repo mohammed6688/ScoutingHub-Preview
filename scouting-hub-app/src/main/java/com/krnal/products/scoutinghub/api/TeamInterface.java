@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dto.TeamDTO;
 import com.krnal.products.scoutinghub.service.TeamService;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
@@ -78,6 +80,7 @@ public class TeamInterface {
         return ResponseEntity.status(HttpStatus.OK).body(teams);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping("team")
     public ResponseEntity<?> addTeam(@Valid TeamDTO teamDTO) {
         String c = "TeamInterface";
@@ -88,6 +91,7 @@ public class TeamInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(creatTeam);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("team")
     public ResponseEntity<?> updateTeam(@Valid TeamDTO zoneDTO) {
         String c = "TeamInterface";
@@ -98,6 +102,7 @@ public class TeamInterface {
         return ResponseEntity.status(HttpStatus.OK).body(updateTeam);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("team")
     public ResponseEntity<?> deleteTeam(@RequestParam("id") Integer id) {
         String c = "TeamInterface";

@@ -7,7 +7,6 @@ import com.krnal.products.scoutinghub.dto.*;
 import com.krnal.products.scoutinghub.mapper.*;
 import com.krnal.products.scoutinghub.model.*;
 import com.krnal.products.scoutinghub.security.UserSessionHelper;
-import com.krnal.products.scoutinghub.specification.MatchReportSpecification;
 import com.krnal.products.scoutinghub.specification.MatchReportDecorator;
 import com.krnal.products.scoutinghub.specification.SimpleSpecification;
 import com.krnal.products.scoutinghub.types.MatchReportResponse;
@@ -69,6 +68,7 @@ public class MatchReportService {
             Page<MatchReport> matchReports = matchReportRepo.findAll(pageable);
             List<MatchReportDTO> matchReportDTOS = matchReports.stream()
                     .map(matchReportMapper::getMatchReportDTO)
+                    .filter(matchReportDTO -> !(UserSessionHelper.checkUserAccess(Configs.SCOUTER_ROLE)) || matchReportDTO.getCreatorId().equals(UserSessionHelper.getUserId()))
                     .toList();
             logger.info(createLogMessage(c, m, "Success"));
             return new MatchReportResponse(matchReportDTOS, matchReports.getTotalElements());

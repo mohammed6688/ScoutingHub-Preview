@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.types.SearchCriteria;
 import com.krnal.products.scoutinghub.dto.ZoneDTO;
 import com.krnal.products.scoutinghub.service.ZoneService;
@@ -64,6 +66,7 @@ public class ZoneInterface {
         return ResponseEntity.status(HttpStatus.OK).body(zones);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping("zone")
     public ResponseEntity<?> addZone(@Valid @RequestBody ZoneDTO zoneDTO) {
         String c = "ZoneInterface";
@@ -74,6 +77,7 @@ public class ZoneInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(createdZone);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("zone")
     public ResponseEntity<?> updateZone(@Valid @RequestBody ZoneDTO zoneDTO) {
         String c = "ZoneInterface";
@@ -84,6 +88,7 @@ public class ZoneInterface {
         return ResponseEntity.status(HttpStatus.OK).body(updatedZone);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("zone")
     public ResponseEntity<?> deleteZone(@RequestParam("id") Integer id) {
         String c = "ZoneInterface";

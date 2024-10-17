@@ -20,7 +20,7 @@ public class TeamDecorator extends SpecificationDecorator<Team> {
         if (criteria.getKey().equalsIgnoreCase("zoneName")) {
             Join<Team, Zone> zoneJoin = root.join("zone", JoinType.INNER);
             if (criteria.getOperation().equalsIgnoreCase(":")) {
-                return builder.like(zoneJoin.get("zoneName"), "%" + criteria.getValue() + "%");
+                return builder.like(zoneJoin.get("zoneName"), criteria.getValue() + "%");
             } else {
                 throw new UnsupportedOperationException("Operation " + criteria.getOperation() + " not supported for zoneName");
             }

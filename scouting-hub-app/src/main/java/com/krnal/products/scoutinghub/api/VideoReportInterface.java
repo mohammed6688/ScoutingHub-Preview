@@ -1,5 +1,7 @@
 package com.krnal.products.scoutinghub.api;
 
+import com.krnal.products.scoutinghub.authorization.RequiresRoles;
+import com.krnal.products.scoutinghub.configs.Configs;
 import com.krnal.products.scoutinghub.dto.VideoReportDTO;
 import com.krnal.products.scoutinghub.enums.OperationTypeEnum;
 import com.krnal.products.scoutinghub.enums.ResourceTypeEnum;
@@ -71,6 +73,7 @@ public class VideoReportInterface {
         return ResponseEntity.status(HttpStatus.OK).body(videoReport);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PostMapping("videoReport")
     public ResponseEntity<?> addVideoReport(@Valid @RequestBody VideoReportDTO videoReportDTO) {
         String c = "VideoReportInterface";
@@ -83,6 +86,7 @@ public class VideoReportInterface {
         return ResponseEntity.status(HttpStatus.CREATED).body(videoReport);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @PutMapping("videoReport")
     public ResponseEntity<?> updateVideoReport(@Valid @RequestBody VideoReportDTO videoReportDTO) {
         String c = "VideoReportInterface";
@@ -95,6 +99,7 @@ public class VideoReportInterface {
         return ResponseEntity.status(HttpStatus.OK).body(videoReport);
     }
 
+    @RequiresRoles({Configs.SCOUTER_ROLE, Configs.ADMIN_ROLE})
     @DeleteMapping("videoReport")
     public ResponseEntity<?> deleteVideoReport(@RequestParam("id") Integer id) {
         String c = "VideoReportInterface";
